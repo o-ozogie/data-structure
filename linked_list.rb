@@ -26,14 +26,15 @@ class LinkedList
   # 연결리스트를 모두 순회했는데도 삭제할 값을 가진 노드를 찾지 못하면, 에러 메새지를 반환한다.
   def remove_node(value)
     current = @head
-    until current.address.nil?
+    until current.nil?
       if current.address.value == value
-        current.address = current.address.address
+        return current.address = current.address.address
       end
+
       current = current.address
     end
 
-    p "'#{value}' doesn't exist" if current.address.nil?
+    p "'#{value}' doesn't exist" if current.nil?
   end
 
   # 노드를 쭉 순회하며 노드의 값을 출력한다.
