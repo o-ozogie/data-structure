@@ -27,14 +27,14 @@ class LinkedList
   def remove_node(value)
     current = @head
     until current.nil?
+      return p "'#{value}' doesn't exist" if current.address.nil?
+
       if current.address.value == value
         return current.address = current.address.address
       end
 
       current = current.address
     end
-
-    p "'#{value}' doesn't exist" if current.nil?
   end
 
   # 노드를 쭉 순회하며 노드의 값을 출력한다.
