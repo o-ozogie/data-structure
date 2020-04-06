@@ -12,10 +12,15 @@ class Node
 end
 
 class BinarySearchTree
+  attr_accessor :preorder, :inorder, :postorder, :head
   # 객체를 생성할 때, 새 노드를 생성하고 해당 노드를 헤드노드로 지정한다.
   def initialize(value)
     @tree = Node.new(value)
     @head = @tree
+
+    @preorder = []
+    @inorder = []
+    @postorder = []
   end
 
   # 삽입할 값이 현재 노드의 값보다 작으면 왼쪽 자식, 작지 않으면 오른쪽 자식을 현재 값으로 지정한다.
@@ -78,8 +83,70 @@ class BinarySearchTree
   end
 
   # 값 삭제 메소드는 더 공부해서 추후 구현 예정.
+
+  # BST의 세 가지 순회 종류 구현
+  # 왼쪽이나 오른쪽 자식 노드가 존재할 경우, 계속해서 재귀호출 하도록 설계하였다.
+
+  # preorder 메소드는 부모 노드 - 왼쪽 자식 노드 - 오른쪽 자식 노드 순으로 순회한다.
+  def preorder(node = @head)
+    @preorder << node.value
+    preorder(node.left_child) if node.left_child
+    preorder(node.right_child) if node.right_child
+
+    @preorder
+  end
+
+  # inorder 메소드는 왼쪽 자식 노드 - 부모 노드 - 오른쪽 자식 노드 순으로 순회한다.
+  def inorder(node = @head)
+    inorder(node.left_child) if node.left_child
+    @inorder << node.value
+    inorder(node.right_child) if node.right_child
+
+    @inorder
+  end
+
+  # postorder 메소드는 왼쪽 자식 노드 - 오른쪽 자식 노드 - 부모 노드 순으로 순회한다.
+  def postorder(node = @head)
+    postorder(node.left_child) if node.left_child
+    postorder(node.right_child) if node.right_child
+    @postorder << node.value
+  end
+end
+
+# 앞서 구현한 메소드는 인스턴스 변수에 결과 배열을 저장하므로, 두 번 이상 호출하면 값이 쌓인다.
+# 이 문제를 해결하기 위해서 데코레이터 패턴을 적용하여 함수가 시작하기 전에 저장될 배열을 초기화하고 함수가 작동하도록 하였다.
+class BSTHelper < SimpleDelegator
+  def preorder(node = head)
+    self.preorder = []
+    super(node)
+  end
+
+  def inorder(node = head)
+    self.inorder = []
+    super(node)
+  end
+
+  def postorder(node = head)
+    self.postorder = []
+    super(node)
+  end
 end
 
 bst = BinarySearchTree.new(10)
 bst.push(3)
-bst.show
+bst.push(20)
+bst.push(1)
+bst.push(2)
+
+bst_extended = BSTHelper.new(bst)
+p bst_extended.preorder
+p bst_extended.inorder
+p bst_extended.postorder
+
+p bst_extended.preorder
+p bst_extended.inorder
+p bst_extended.postorder
+
+p bst_extended.preorder
+p bst_extended.inorder
+p bst_extended.postorder
