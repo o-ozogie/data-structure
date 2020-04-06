@@ -1,4 +1,6 @@
 class Graph
+  attr_accessor :graph
+
   # 그래프 인스턴스 생성 시 빈 해시와 노드를 할당할 count변수를 초기화 한다.
   def initialize
     @graph = {}
@@ -16,40 +18,44 @@ class Graph
       next unless @graph[vertex]
 
       @graph[new_vertex][vertex] = cost
+      @graph[vertex][new_vertex] = cost
     end
 
     @count += 1
-    @graph[new_vertex]
+    @graph
   end
 
   # 간선을 추가하는 메소드, 간선의 방향을 start_vertex와 end_vertex 인자로 받으며, 간선의 cost도 설정할 수 있다.
   # 만약 간선에 올바르지 않은 정점이 포함된다면, false를 반환하며 간선이 추가되지 않는다.
-  def add_edge(start_vertex, end_vertex, cost)
-    return false unless @graph[start_vertex] && @graph[end_vertex]
+  def add_edge(vertex1, vertex2, cost)
+    return false unless @graph[vertex1] && @graph[vertex2]
 
-    @graph[start_vertex][end_vertex] = cost
-    @graph[start_vertex]
+    @graph[vertex1][vertex2] = cost
+    @graph[vertex2][vertex1] = cost
+
+    @graph
   end
 
   # 정점을 삭제하는 메소드. 그래프를 순회하며, 삭제할 정점과 연결된 간선을 전부 삭제한 후, 해당 정점을 삭제한다.
   def remove_vertex(value)
     return false unless @graph[value]
 
-    @graph.each do |key, vertex|
-      next if vertex.empty?
+    @graph.each do |key, edge|
+      next if edge.empty?
 
-      vertex.each_key do |end_vertex|
-        @graph[key].delete(end_vertex) if value == end_vertex
+      edge.each_key do |vertex|
+        @graph[key].delete(vertex) if value == vertex
       end
     end
 
     @graph.delete(value)
   end
 
-  # 간선을 삭제하는 메소드, 간선이 시작되는 정점과 끝나는 정점을 인자로 넘겨받아 삭제한다.
-  def remove_edge(start_vertex, end_vertex)
-    if @graph[start_vertex] && @graph[end_vertex]
-      @graph[start_vertex].delete(end_vertex)
+  # 간선을 삭제하는 메소드, 정점 두 개를 인자로 넘겨받아 삭제한다.
+  def remove_edge(vertex1, vertex2)
+    if @graph[vertex1] && @graph[vertex2]
+      @graph[vertex1].delete(vertex2)
+      @graph[vertex2].delete(vertex1)
     else
       false
     end
@@ -57,23 +63,26 @@ class Graph
 
   # 해시의 값을 출력한다.
   def show_graph
-    p @graph
+    @graph
   end
 end
 
-graph = Graph.new
+if __FILE__ == $PROGRAM_NAME
+  graph = Graph.new
 
-graph.add_vertex
-graph.add_vertex
-graph.add_vertex
+  graph.add_vertex
+  graph.add_vertex
+  graph.add_vertex
 
-graph.show_graph
+  p graph.show_graph
 
-graph.add_vertex(B: 1, C: 2)
-graph.add_edge(:B, :C, 3)
+  graph.add_vertex(B: 1, C: 2)
+  graph.add_edge(:B, :C, 3)
 
-graph.show_graph
+  p graph.show_graph
 
-graph.remove_vertex(:B)
-graph.remove_edge(:D, :C)
-graph.show_graph
+  graph.remove_vertex(:B)
+  graph.remove_edge(:D, :C)
+
+  p graph.show_graph
+end
